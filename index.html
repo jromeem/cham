@@ -9,46 +9,57 @@
 		var time_elapsed = 0;
 
 		Crafty.init(BOARD_WIDTH, BOARD_HEIGHT);
-		Crafty.background("gray");
+		Crafty.background("transparent");
 
+		console.log("start");
+
+		/* // testing only
 		var red_box = Crafty.e("2D, Canvas, Color, Fourway")
 							.attr({x: 160, y: 96, w: 32, h: 32})
 							.color("#FF0000")
 							.fourway(10);
+		*/
 
-		// put timer in bottom right corner
-		// change for every second
+		/* ==================== */
+		/* ===== ENTITIES ===== */
+		/* ==================== */
 		
-		/*Crafty.sprite(128, "img/timer.png", 
-		              {
-			        	timer_1: [4, 1],
-			        	timer_2: [3, 1],
-			        	timer_3: [2, 1],
-			        	timer_4: [1, 1],
-			        	timer_5: [0, 1],
-			        	timer_6: [4, 0],
-			        	timer_7: [3, 0],
-			        	timer_8: [2, 0],
-			        	timer_9: [1, 0],
-			        	timer_10:[0, 0],
-			          });*/
-		/*Crafty.sprite(128, "img/timer.png", 
-					  { timer_1: [0, 0, 1, 1],
-					    timer_2: [0, 1, 1, 1].
-					    timer_3: [0, 2, 1, 1],
-					    timer_4: [0, 3, 1, 1],
-					    timer_5: [0, 4, 1, 1],
-					    timer_6: [1, 0, 1, 1],
-					    timer_7: [1, 1, 1, 1],
-					    timer_8: [1, 2, 1, 1],
-					    timer_9: [1, 3, 1, 1],
-					    timer_10:[1, 4, 1, 1] }
-					 );*/
-		Crafty.sprite(128, "img/timer_10.png", { timer_sprite: [0, 0] });
+		Crafty.sprite(64, "img/cham-walk.png", { cham_walk_sprite: [0, 0]});
+		var cham_walking_entity = Crafty.e("2D, Canvas, SpriteAnimation, Fourway, cham_walk_sprite")
+										.attr({x:160, y:96})
+										.animate("cham_walking", 0, 0, 3)
+										.animate("cham_walking", 20, -1)
+										.fourway(4);
+		
+
+		// WOW THIS IS SAD
+		Crafty.sprite(128, "img/timer-10.png", { timer_sprite: [0, 0] });
 		var timer_entity = Crafty.e("2D, Canvas, SpriteAnimation, timer_sprite")
 								 .attr({x: 672, y: 472})
 								 .animate("timer_ticking", 0, 0, 9) // setup animation
-								 .animate("timer_ticking", 600, -1); // start animation
+								 .animate("timer_ticking", 500, -1); // start animation
+								 // closest accuration to changing every second ... sigh
+
+		// catch every second
+		var seconds = 1;
+		var one_second = Crafty.e("2D, Canvas, Delay")
+							   .delay(function() {
+							   		console.log(seconds++)
+							   }, 1000, -1);
+
+		// catch every 10 seconds
+		/*
+		var tens = 1;
+		var ten_seconds = Crafty.e("Delay")
+								.delay(function() {
+									console.log((tens++) + "*10 seconds");
+								}, 10000, -1);
+		*/
+
+		/* =================== */
+		/* ===== SCENES  ===== */
+		/* =================== */
+
 
 	</script>
 </body>
