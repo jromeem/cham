@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>	
+	<script type="text/javascript" src="js/crafty.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var BOARD_WIDTH = 800;  // x
+		var BOARD_HEIGHT = 600; // y
+		var time_elapsed = 0;
+
+		Crafty.init(BOARD_WIDTH, BOARD_HEIGHT);
+		Crafty.background("gray");
+
+		var red_box = Crafty.e("2D, Canvas, Color, Fourway")
+							.attr({x: 160, y: 96, w: 32, h: 32})
+							.color("#FF0000")
+							.fourway(10);
+
+		// put timer in bottom right corner
+		// change for every second
+		
+		/*Crafty.sprite(128, "img/timer.png", 
+		              {
+			        	timer_1: [4, 1],
+			        	timer_2: [3, 1],
+			        	timer_3: [2, 1],
+			        	timer_4: [1, 1],
+			        	timer_5: [0, 1],
+			        	timer_6: [4, 0],
+			        	timer_7: [3, 0],
+			        	timer_8: [2, 0],
+			        	timer_9: [1, 0],
+			        	timer_10:[0, 0],
+			          });*/
+		/*Crafty.sprite(128, "img/timer.png", 
+					  { timer_1: [0, 0, 1, 1],
+					    timer_2: [0, 1, 1, 1].
+					    timer_3: [0, 2, 1, 1],
+					    timer_4: [0, 3, 1, 1],
+					    timer_5: [0, 4, 1, 1],
+					    timer_6: [1, 0, 1, 1],
+					    timer_7: [1, 1, 1, 1],
+					    timer_8: [1, 2, 1, 1],
+					    timer_9: [1, 3, 1, 1],
+					    timer_10:[1, 4, 1, 1] }
+					 );*/
+		Crafty.sprite(128, "img/timer_10.png", { timer_sprite: [0, 0] });
+		var timer_entity = Crafty.e("2D, Canvas, SpriteAnimation, timer_sprite")
+								 .attr({x: 672, y: 472})
+								 .animate("timer_ticking", 0, 0, 9) // setup animation
+								 .animate("timer_ticking", 600, -1); // start animation
+
+	</script>
+</body>
+</html>
