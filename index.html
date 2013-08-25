@@ -4,14 +4,21 @@
 </head>
 <body>
 	<script type="text/javascript">
-		var BOARD_WIDTH = 800;  // x
-		var BOARD_HEIGHT = 600; // y
-		var time_elapsed = 0;
-
+		var BOARD_WIDTH = 600;  // x
+		var BOARD_HEIGHT = 400; // y
+		var background_color = get_random_color(); // string
 		Crafty.init(BOARD_WIDTH, BOARD_HEIGHT);
-		Crafty.background("transparent");
-
+		//Crafty.background(get_random_color());
 		console.log("start");
+
+		function get_random_color() {
+			var letters = '0123456789ABCDEF'.split('');
+			var color = '#';
+			for (var i = 0; i < 6; i++ ) {
+				color += letters[Math.round(Math.random() * 15)];
+			}
+			return color;
+		}
 
 		/* // testing only
 		var red_box = Crafty.e("2D, Canvas, Color, Fourway")
@@ -24,18 +31,21 @@
 		/* ===== ENTITIES ===== */
 		/* ==================== */
 		
-		Crafty.sprite(64, "img/cham-walk.png", { cham_walk_sprite: [0, 0]});
+		// [0, 0]: right, [0, 1]: left
+		Crafty.sprite(64, "img/cham-walk.png", { cham_walk_sprite: [0, 0] });
+		/*
+		//Crafty.sprite(64, "img/cham-walk.png", { cham_walk_sprite: [0, 1]});
 		var cham_walking_entity = Crafty.e("2D, Canvas, SpriteAnimation, Fourway, cham_walk_sprite")
-										.attr({x:160, y:96})
+										.attr({x: 160, y: 96})
 										.animate("cham_walking", 0, 0, 3)
 										.animate("cham_walking", 20, -1)
-										.fourway(4);
-		
+										.fourway(2);
+		*/
 
-		// WOW THIS IS SAD
+		
 		Crafty.sprite(128, "img/timer-10.png", { timer_sprite: [0, 0] });
 		var timer_entity = Crafty.e("2D, Canvas, SpriteAnimation, timer_sprite")
-								 .attr({x: 672, y: 472})
+								 .attr({x: BOARD_WIDTH-128, y: BOARD_HEIGHT-128})
 								 .animate("timer_ticking", 0, 0, 9) // setup animation
 								 .animate("timer_ticking", 500, -1); // start animation
 								 // closest accuration to changing every second ... sigh
@@ -44,8 +54,15 @@
 		var seconds = 1;
 		var one_second = Crafty.e("2D, Canvas, Delay")
 							   .delay(function() {
-							   		console.log(seconds++)
-							   }, 1000, -1);
+							   		console.log(seconds++);
+							   		old_color = background_color;
+							   		new_color = get_random_color();
+							   		for (var i = 0; i<5; i++) {
+							   			Crafty.background(old_color);
+							   			Crafty.background(new_color);
+							   		}
+							   		Crafty.background(new_color);
+							   }, 10000, -1);
 
 		// catch every 10 seconds
 		/*
@@ -60,6 +77,95 @@
 		/* ===== SCENES  ===== */
 		/* =================== */
 
+		
+		Crafty.scene("main", function() {
+			// generateStage(); // here
+			Crafty.background("#FCCF00");
+
+			console.log("1: set up components");
+			Crafty.c("CustomControls", {
+				__move: {left: false, right: false, up: false, down: false},
+				_speed: 5,
+
+				CustomControls: function (speed) {
+					console.log("2: set custom control variables");
+					if (speed) this._speed = speed;
+					var move = this.__move;
+
+					this.bind("EnterFrame", function() {
+						console.log("3: update frames")
+						if (move.right) this.x += this._speed;
+						else if (move.left) this.x -= this._speed;
+						else if (move.up) this.y -= this._speed;
+						else if (move.down) this.y += this._speed;
+					}).bind('KeyDown', function (e) {
+						move.right = move.left = move.down = move.up = false;
+						console.log("4: keys down here");
+						// if the keys are down, set the direction
+						if (e.keyCode == Crafty.keys['RIGHT_ARROW']) move.right = true;
+						if (e.keyCode == Crafty.keys['LEFT_ARROW']) move.left = true;
+						if (e.keyCode == Crafty.keys['UP_ARROW']) move.up = true;
+						if (e.keyCode == Crafty.keys['DOWN_ARROW']) move.down = true;
+						
+						//this.preventTypeaheadFind(e);
+					}).bind("KeyUp", function (e) {
+						console.log("5: keys up here");
+						// if key is released, stop moving
+						if (e.keyCode == Crafty.keys['RIGHT_ARROW']) move.right = false;
+						if (e.keyCode == Crafty.keys['LEFT_ARROW']) move.left = false;
+						if (e.keyCode == Crafty.keys['UP_ARROW']) move.up = false;
+						if (e.keyCode == Crafty.keys['DOWN_ARROW']) move.down = false;
+
+						//this.preventTypeaheadFind(e);
+					});
+
+					console.log("6: returning component");
+					return this;
+				}
+			}); // end of component
+
+			console.log("7: in main scene");
+			console.log("8: enter entities");
+
+			var cham_player = Crafty.e("2D, Canvas, cham_walk_sprite, Controls, CustomControls, SpriteAnimation")
+									.attr({x: 160, y: 160, z: 1})
+									.CustomControls(1)
+									.animate("walk_right", 0, 0, 3)
+									.animate("walk_left", 4, 0, 7)
+									.animate("walk_up", 0, 0, 3) // same as left
+									.animate("walk_down", 4, 0, 7) // same as right
+									.bind("EnterFrame", function (e) {
+
+										//console.log("9: update sprite");
+										if (this.__move.left) {
+											console.log("START: left");
+											if (!this.isPlaying("walk_left")) {
+												this.stop().animate("walk_left", 10);
+												console.log("STOP: left");
+											}
+										}
+
+										if (this.__move.right) {
+											if (!this.isPlaying("walk_right"))
+												this.stop().animate("walk_right", 10);
+										}
+
+										if (this.__move.up) {
+											if (!this.isPlaying("walk_up"))
+												this.stop().animate("walk_up", 10);
+										}
+
+										if (this.__move.down) {
+											if (!this.isPlaying("walk_down"))
+												this.stop().animate("walk_down", 10);
+										}
+									}).bind("KeyUp", function (e) {
+										this.stop();
+									}); // end of cham_player entity
+		}); // end of crafty scene
+
+	Crafty.scene("main");
+	console.log("99: end game script");
 
 	</script>
 </body>
