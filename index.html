@@ -57,19 +57,19 @@
 					for (var i = 0; i < randShelfLength; i++) {
 						console.log("0.7: making shelf");
 						if (i == 0) {
-							Crafty.e("2D, Canvas, shelf, shelf_left_sprite, Collision, WiredHitBox")
+							Crafty.e("2D, Canvas, shelf, shelf_left_sprite, Collision")
 								  .attr({x: 32*i + nextshelf, y: nextrow, z: 1})
 								  .collision(
 								  	new Crafty.polygon([0,0],[31,0],[31,4],[0,4]));
 						// last part of shelf
 						} else if (i == randShelfLength - 1) {
-							Crafty.e("2D, Canvas, shelf, shelf_rigt_sprite, Collision, WiredHitBox")
+							Crafty.e("2D, Canvas, shelf, shelf_rigt_sprite, Collision")
 							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1})
 								  .collision(
 								  	new Crafty.polygon([0,0],[31,0],[31,4],[0,4]));
 							nextshelf += 32*i + 32;
 						} else {
-							Crafty.e("2D, Canvas, shelf, shelf_midd_sprite, Collision, WiredHitBox")
+							Crafty.e("2D, Canvas, shelf, shelf_midd_sprite, Collision")
 							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1})
 								  .collision(
 								  	new Crafty.polygon([0,0],[31,0],[31,4],[0,4]));
@@ -153,7 +153,7 @@
 			console.log("7: in main scene");
 			console.log("8: enter entities");
 
-			var cham_player = Crafty.e("2D, Canvas, cham_walk_sprite, Controls, CustomControls, SpriteAnimation, cham_player, Collision, WiredHitBox")
+			var cham_player = Crafty.e("2D, Canvas, cham_walk_sprite, Controls, CustomControls, SpriteAnimation, cham_player, Collision")
 									.attr({x: 70, y: 160, z: 1})
 									.CustomControls(1)
 									.animate("walk_right", 0, 0, 3)
@@ -190,10 +190,25 @@
 									}).collision(
 										new Crafty.polygon(
 												   [2, 16],[61,16],[61,39],[2,39]) // cham's hit box
-									).onHit(function() {
-										// TODO
-									});
-									 // end of cham_player entity
+									).onHit("shelf", function() {
+										console.log("SHOW ME YOUR MOVES " + this.__move);
+										console.log("GOTTA GO FAST " + this._speed);
+										if (this.__move.up) {
+											this.y += this._speed;
+											this.stop();
+										}
+										if (this.__move.down) {
+											this.y -= this._speed;
+											this.stop();
+										}
+										if (this.__move.left) {
+											this.x += this._speed;
+											this.stop();
+										}
+										if (this.__move.right) {
+											this.x -= this._speed;
+										}
+									}); // end of cham_player entity
 		}); // end of crafty scene
 
 		// it's like calling main()!
