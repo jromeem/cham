@@ -4,45 +4,56 @@
 </head>
 <body>
 	<script type="text/javascript">
+		
+		/* ==================== */
+		/* ===== DECLARES ===== */
+		/* ==================== */
+
 		var BOARD_WIDTH = 600;  // x
 		var BOARD_HEIGHT = 400; // y
 		var background_color = get_random_color(); // string
 		Crafty.init(BOARD_WIDTH, BOARD_HEIGHT);
-		//Crafty.background(get_random_color());
-		console.log("start");
+
+		console.log("0: start script");
 
 		function get_random_color() {
 			var letters = '0123456789ABCDEF'.split('');
 			var color = '#';
 			for (var i = 0; i < 6; i++ ) {
-				color += letters[Math.round(Math.random() * 15)];
+				color += letters[Math.floor(Math.random() * 16)];
 			}
 			return color;
 		}
 
-		/* // testing only
-		var red_box = Crafty.e("2D, Canvas, Color, Fourway")
-							.attr({x: 160, y: 96, w: 32, h: 32})
-							.color("#FF0000")
-							.fourway(10);
-		*/
+		function rand_range(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+
+		function generate_stage() {
+			console.log("0.5: creating stage");
+			var randShelfLength = rand_range(2, 5);
+			for (var i = 0; i < randShelfLength; i++) {
+				if (i == 0) {
+					Crafty.e("2D, Canvas, shelf_left_sprite")
+						  .attr({x: i * 32, y: 40, z: 2});
+				} else if (i == randShelfLength - 1) {
+					Crafty.e("2D, Canvas, shelf_rigt_sprite")
+					      .attr({x: i * 32, y: 40, z: 2});
+				} else {
+					Crafty.e("2D, Canvas, shelf_midd_sprite")
+					      .attr({x: i * 32, y: 40, z: 2});
+				}
+			}
+		}
 
 		/* ==================== */
 		/* ===== ENTITIES ===== */
 		/* ==================== */
 		
-		// [0, 0]: right, [0, 1]: left
-		Crafty.sprite(64, "img/cham-walk.png", { cham_walk_sprite: [0, 0] });
-		/*
-		//Crafty.sprite(64, "img/cham-walk.png", { cham_walk_sprite: [0, 1]});
-		var cham_walking_entity = Crafty.e("2D, Canvas, SpriteAnimation, Fourway, cham_walk_sprite")
-										.attr({x: 160, y: 96})
-										.animate("cham_walking", 0, 0, 3)
-										.animate("cham_walking", 20, -1)
-										.fourway(2);
-		*/
-
-		
+		Crafty.sprite(32, "img/shelf.png", { shelf_left_sprite: [0, 0],
+											shelf_midd_sprite: [1, 0],
+											shelf_rigt_sprite: [2, 0] });
+		Crafty.sprite(64, "img/cham-walk.png", { cham_walk_sprite: [0, 0] }); // [0, 0]: right, [0, 1]: left
 		Crafty.sprite(128, "img/timer-10.png", { timer_sprite: [0, 0] });
 		var timer_entity = Crafty.e("2D, Canvas, SpriteAnimation, timer_sprite")
 								 .attr({x: BOARD_WIDTH-128, y: BOARD_HEIGHT-128})
@@ -50,47 +61,41 @@
 								 .animate("timer_ticking", 500, -1); // start animation
 								 // closest accuration to changing every second ... sigh
 
-		// catch every second
-		var seconds = 1;
-		var one_second = Crafty.e("2D, Canvas, Delay")
-							   .delay(function() {
-							   		console.log(seconds++);
-							   		old_color = background_color;
-							   		new_color = get_random_color();
-							   		for (var i = 0; i<5; i++) {
-							   			Crafty.background(old_color);
-							   			Crafty.background(new_color);
-							   		}
-							   		Crafty.background(new_color);
-							   }, 10000, -1);
-
-		// catch every 10 seconds
-		/*
-		var tens = 1;
-		var ten_seconds = Crafty.e("Delay")
-								.delay(function() {
-									console.log((tens++) + "*10 seconds");
-								}, 10000, -1);
-		*/
-
 		/* =================== */
 		/* ===== SCENES  ===== */
 		/* =================== */
-
 		
 		Crafty.scene("main", function() {
 			// generateStage(); // here
-			Crafty.background("#FCCF00");
-
+			//Crafty.background("#FCCF00");
+			generate_stage();
 			console.log("1: set up components");
+
+			var seconds = 1;
+			var one_second = Crafty.e("2D, Canvas, Delay")
+								   .delay(function() {
+								   		console.log(seconds++);
+								   		old_color = background_color;
+								   		new_color = get_random_color();
+								   		for (var i = 0; i<5; i++) {
+								   			Crafty.background(old_color);
+								   			Crafty.background(new_color);
+								   		}
+								   		Crafty.background(new_color);
+								   }, 10000, -1);
+
 			Crafty.c("CustomControls", {
-				__move: {left: false, right: false, up: false, down: false},
-				_speed: 5,
+				__move: {left: false, right: false, up: false, down: false}, // edit: nvm it's referenced
+				_speed: 3, // edit: nvm it's referenced
 
 				CustomControls: function (speed) {
-					console.log("2: set custom control variables");
-					if (speed) this._speed = speed;
-					var move = this.__move;
+					console.log("2: set custom control variables " + speed);
+					
+					//if (speed) this._speed = speed;	  // what the tutorial said wtf
+					if (this._speed) speed = this._speed; // switch the other way
+					if (this.__move) move = this.__move;
+					//var move = this.__move; ^ above line was originally this line
+					console.log("2.5: speed (param): " + speed);
 
 					this.bind("EnterFrame", function() {
 						console.log("3: update frames")
@@ -140,24 +145,24 @@
 										if (this.__move.left) {
 											console.log("START: left");
 											if (!this.isPlaying("walk_left")) {
-												this.stop().animate("walk_left", 10);
+												this.stop().animate("walk_left", 15);
 												console.log("STOP: left");
 											}
 										}
 
 										if (this.__move.right) {
 											if (!this.isPlaying("walk_right"))
-												this.stop().animate("walk_right", 10);
+												this.stop().animate("walk_right", 15);
 										}
 
 										if (this.__move.up) {
 											if (!this.isPlaying("walk_up"))
-												this.stop().animate("walk_up", 10);
+												this.stop().animate("walk_up", 15);
 										}
 
 										if (this.__move.down) {
 											if (!this.isPlaying("walk_down"))
-												this.stop().animate("walk_down", 10);
+												this.stop().animate("walk_down", 15);
 										}
 									}).bind("KeyUp", function (e) {
 										this.stop();
