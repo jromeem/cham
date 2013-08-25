@@ -35,6 +35,18 @@
 		/* ===== SCENES ===== */
 		/* ================== */
 
+		// TITLE SCREEN HELL YEAH
+		Crafty.scene("title", function() {
+			var bg = Crafty.e("2D, DOM, Image")
+            			   .attr({w: 600, h: 400})
+            			   .image("img/cham-o-flage.png");
+            var delay = Crafty.e("Delay")
+            				  .delay(function() {
+            				  	console.log("you are a sticky pig! >:(");
+            				  	Crafty.scene("main");
+            				  }, 2000, 1);
+		});
+
 		// WOW SO BAD... OH WELL LOL
 		function generate_stage() {
 			console.log("0.5: creating stage");
@@ -45,16 +57,25 @@
 					for (var i = 0; i < randShelfLength; i++) {
 						console.log("0.7: making shelf");
 						if (i == 0) {
-							Crafty.e("2D, Canvas, shelf_left_sprite")
-								  .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
+							Crafty.e("2D, Canvas, shelf, shelf_left_sprite, Collision, WiredHitBox")
+								  .attr({x: 32*i + nextshelf, y: nextrow, z: 1})
+								  .collision(
+								  	new Crafty.polygon([0,0],[31,0],[31,4],[0,4]));
 						// last part of shelf
 						} else if (i == randShelfLength - 1) {
-							Crafty.e("2D, Canvas, shelf_rigt_sprite")
-							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
+							Crafty.e("2D, Canvas, shelf, shelf_rigt_sprite, Collision, WiredHitBox")
+							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1})
+								  .collision(
+								  	new Crafty.polygon([0,0],[31,0],[31,4],[0,4]));
 							nextshelf += 32*i + 32;
 						} else {
-							Crafty.e("2D, Canvas, shelf_midd_sprite")
-							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
+							Crafty.e("2D, Canvas, shelf, shelf_midd_sprite, Collision, WiredHitBox")
+							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1})
+								  .collision(
+								  	new Crafty.polygon([0,0],[31,0],[31,4],[0,4]));
+
+		/* ================================ MT. BRACKEYS ============================= */
+
 						}//	}              _                       ~*~
 					}//			}          0   -- just climbing    //o\
 				}//					}     /|\     mount brakeys   /.||\\
@@ -132,7 +153,7 @@
 			console.log("7: in main scene");
 			console.log("8: enter entities");
 
-			var cham_player = Crafty.e("2D, Canvas, cham_walk_sprite, Controls, CustomControls, SpriteAnimation")
+			var cham_player = Crafty.e("2D, Canvas, cham_walk_sprite, Controls, CustomControls, SpriteAnimation, cham_player, Collision, WiredHitBox")
 									.attr({x: 70, y: 160, z: 1})
 									.CustomControls(1)
 									.animate("walk_right", 0, 0, 3)
@@ -166,14 +187,23 @@
 										}
 									}).bind("KeyUp", function (e) {
 										this.stop();
-									}); // end of cham_player entity
+									}).collision(
+										new Crafty.polygon(
+												   [2, 16],[61,16],[61,39],[2,39]) // cham's hit box
+									).onHit(function() {
+										// TODO
+									});
+									 // end of cham_player entity
 		}); // end of crafty scene
 
-		Crafty.scene("main");
+		// it's like calling main()!
+		//Crafty.scene("main");
+		Crafty.scene("title");
 
 		/* =================== */
 		/* ===== HELPERS ===== */
 		/* =================== */
+
 		function get_random_color() {
 			var letters = '0123456789ABCDEF'.split('');
 			var color = '#';
