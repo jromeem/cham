@@ -34,12 +34,36 @@
 		/* ================== */
 		/* ===== SCENES ===== */
 		/* ================== */
-		
-		Crafty.scene("main", function() {
-			// generateStage(); // here
-			//Crafty.background("#FCCF00");
-			generate_stage();
 
+		// WOW SO BAD... OH WELL LOL
+		function generate_stage() {
+			console.log("0.5: creating stage");
+			for (var nextrow = 40; nextrow < BOARD_HEIGHT; nextrow += 80) {
+			// install shelves from left to right (this happens first!!)
+				for (var nextshelf = 0; nextshelf < BOARD_WIDTH; nextshelf += 70) {
+					var randShelfLength = rand_range(4, 7);
+					for (var i = 0; i < randShelfLength; i++) {
+						console.log("0.7: making shelf");
+						if (i == 0) {
+							Crafty.e("2D, Canvas, shelf_left_sprite")
+								  .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
+						// last part of shelf
+						} else if (i == randShelfLength - 1) {
+							Crafty.e("2D, Canvas, shelf_rigt_sprite")
+							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
+							nextshelf += 32*i + 32;
+						} else {
+							Crafty.e("2D, Canvas, shelf_midd_sprite")
+							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
+						}//	}              _                       ~*~
+					}//			}          0   -- just climbing    //o\
+				}//					}     /|\     mount brakeys   /.||\\
+			}//							} < \                    /o/||.\o
+		}//									}       __\/               ||
+        //										  .(__)O
+        //										    ""
+		Crafty.scene("main", function() {
+			generate_stage();
 			var red_box = Crafty.e("2D, Canvas, Color, Fourway")
 					.attr({x: 160, y: 96, w: 32, h: 32})
 					.color("#FF0000")
@@ -161,32 +185,6 @@
 
 		function rand_range(min, max) {
 			return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
-
-		// WOW SO BAD... OH WELL LOL
-		function generate_stage() {
-			console.log("0.5: creating stage");
-			for (var nextrow = 40; nextrow < BOARD_HEIGHT; nextrow += 80) {
-			// install shelves from left to right (this happens first!!)
-				for (var nextshelf = 0; nextshelf < BOARD_WIDTH; nextshelf += 70) {
-					var randShelfLength = rand_range(4, 7);
-					for (var i = 0; i < randShelfLength; i++) {
-						console.log("0.7: making shelf");
-						if (i == 0) {
-							Crafty.e("2D, Canvas, shelf_left_sprite")
-								  .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
-						// last part of shelf
-						} else if (i == randShelfLength - 1) {
-							Crafty.e("2D, Canvas, shelf_rigt_sprite")
-							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
-							nextshelf += 32*i + 32;
-						} else {
-							Crafty.e("2D, Canvas, shelf_midd_sprite")
-							      .attr({x: 32*i + nextshelf, y: nextrow, z: 1});
-						}
-					}
-				}
-			}
 		}
 
 		console.log("99: end game script");
